@@ -1,9 +1,35 @@
+// common ajax setup
+$.nette.ext({
+	before: function(xhr, settings) {
+		// do not process manually triggered xhr using $.ajax()
+		// process only form submissions
+		if (!settings.nette) {
+			return true;
+		}
+		var n = settings.nette,
+			form = n.el.closest('form')[0],
+			$submitBtn = null;
+		if (n.isSubmit || n.isImage) {
+			$submitBtn = n.el;
+		}
+
+		if (formSubmitted(form, n.e, $submitBtn) === false) {
+			return false;
+		}
+	}
+});
+
+// common non-ajax setup
+$(document).on('submit', 'form', function(e) {
+	formSubmitted(this, e);
+});
+
 
 var MFUFallbackController;
 (function(){
 	MFUFallbackController = function(rootEl, fallbacks) {
 
-		this.fallbackLinkText = "Is there problem with uploading files? Click here."; 
+		this.fallbackLinkText = "Is there problem with uploading files? Click here.";
 
 		this.fallbacks = fallbacks;
 		this.rootEl = rootEl;
@@ -26,7 +52,7 @@ var MFUFallbackController;
 		this.showUI = function(ui) {
 			document.getElementById(ui.id).style.display = "block";
 		}
-		
+
 		this.swithUI = function(ui) {
 			var currentUI = this.activeUI||this.fallbacks[0];
 			if(eval(currentUI.destruct,this) == true &&eval(ui.init,this)==true) {
@@ -35,7 +61,7 @@ var MFUFallbackController;
 				this.showUI(ui);
 
 				this.onUISwitch(currentUI,ui);
-				
+
 			}
 		}
 
