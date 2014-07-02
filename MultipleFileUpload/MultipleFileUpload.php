@@ -130,7 +130,7 @@ class MultipleFileUpload extends Forms\Controls\UploadControl {
 		}
 
 		if ($req->getMethod() !== "POST") {
-			return;
+			//return;	// Resumable needs GET method
 		}
 
 		self::getQueuesModel()->initialize();
