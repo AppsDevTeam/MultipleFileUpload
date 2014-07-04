@@ -18,6 +18,7 @@ var fallbackController = this;
 		}
 		
 		var $div = $('#'+{$id|escapeJs|noescape});
+		var $filenames = $('#'+{$id|escapeJs|noescape}+'-filenames');
 		var $progressvalue = $('#'+{$id|escapeJs|noescape}+'-progressvalue');
 		var $cancel = $('#'+{$id|escapeJs|noescape}+'-cancel');
 		$cancel.on('click', function(e){
@@ -49,6 +50,7 @@ var fallbackController = this;
 		});
 		r.on('fileAdded', function(file, event){
 			formLocks++;
+			updateFileNames();
 		});
 		/*
 		r.on('filesAdded', function(array){
@@ -79,6 +81,16 @@ var fallbackController = this;
 				//console.debug();
 			});
 		*/
+		
+		function updateFileNames() {
+			var $fs = $('');
+			for (i in r.files) {
+				var $f = $('<div>')
+					.html(r.files[i]['fileName']);
+				$fs = $fs.add($f);
+			}
+			$filenames.empty().append($fs);
+		}
 		
 	});
 
