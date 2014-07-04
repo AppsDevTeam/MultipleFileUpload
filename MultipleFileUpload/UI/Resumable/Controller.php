@@ -549,6 +549,7 @@ class Controller extends AbstractInterface {
 		// TODO: make creation of link nicer!
 		$baseUrl = Environment::getContext()->getService('httpRequest')->url->baseUrl;
 		$tpl->uploadLink = $baseUrl."?token=".$tpl->token."&uploader=resumable";
+		$tpl->chunkSize = min(5 * 1024 * 1024, MultipleFileUpload::parseIniSize(ini_get('upload_max_filesize')));
 		$tpl->id = $upload->getHtmlId();
 		return $tpl->__toString(TRUE);
 	}

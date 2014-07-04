@@ -7,27 +7,49 @@ var fallbackController = this;
 		
 		var r = new Resumable({
 			target: {$uploadLink|escapeJs|noescape},
-			query: { upload_token:'my_token'},
-			chunkSize:10*1024,
+			query: {},
+			chunkSize: {$chunkSize},
+			maxFiles: {$maxFiles},
+			maxFileSize: {$sizeLimit},
 		});
 		// Resumable.js isn't supported, fall back on a different method
 		if(!r.support) {
 			fallbackController.fallback();
 		}
 		
-		r.assignBrowse(document.getElementById({$id|escapeJs|noescape}));
-		r.assignDrop(document.getElementById('cu-drop'));
+		var $div = $('#'+{$id|escapeJs|noescape});
+		var $progressvalue = $('#'+{$id|escapeJs|noescape}+'-progressvalue');
+		var $cancel = $('#'+{$id|escapeJs|noescape}+'-cancel');
+		$cancel.on('click', function(e){
+			r.cancel();
+		});
 		
+		var formLocks = 0;
+		var $form = $div.closest('form');
+		if ($form.length) {
+			$form.on('submit', function(e){
+				if (formLocks) {
+					e.preventDefault();
+					r.upload();
+				}
+			});
+		}
+		
+		r.assignBrowse(document.getElementById({$id|escapeJs|noescape}+'-browse'));
+		
+		r.on('complete', function(){
+			formLocks = 0;
+			$form.trigger('submit');
+		});
 		r.on('fileSuccess', function(file){
-				console.debug('fileSuccess', file);
-			});
+			$form.trigger('submit');
+		});
 		r.on('fileProgress', function(file){
-				console.debug('fileProgress', file);
-			});
+			$progressvalue.html(Math.floor(r.progress() * 100) + '%');
+		});
 		r.on('fileAdded', function(file, event){
-				r.upload();
-				//console.debug(file, event);
-			});
+			formLocks++;
+		});
 		/*
 		r.on('filesAdded', function(array){
 				//console.debug(array);
